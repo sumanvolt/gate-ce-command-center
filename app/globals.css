@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --color-iitb-crest: #0b2545;
+  --color-iitb-crest-dark: #061628;
+  --color-iitb-lake: #134074;
+  --color-iitb-slate: #8da9c4;
+  --color-iitb-subtle: #eef4f8;
+  --color-iitb-gold: #e0a96d;
+  --color-iitb-gold-light: #f5d6a8;
+  --color-iitb-emerald: #10b981;
+  --color-iitb-crimson: #ef4444;
+
+  --shadow-neo: 4px 4px 0px 0px #0b2545;
+  --shadow-neo-sm: 2px 2px 0px 0px #0b2545;
+}
+
+body {
+  background-color: #eef4f8;
+  color: #0b2545;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+.recharts-wrapper,
+.recharts-wrapper *,
+.recharts-surface,
+.recharts-surface * {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #0b2545;
+}
+::-webkit-scrollbar-track {
+  background: #eef4f8;
+}
