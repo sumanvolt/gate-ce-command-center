@@ -1,193 +1,155 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Timer, Target, Flame, DownloadCloud, RefreshCw, Compass } from "lucide-react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from 'react';
+import { Download, RefreshCw, Target } from 'lucide-react';
 
-interface GoalHeaderProps {
-  overallProgress: number;
+// GATE CE is historically held on the first Sunday of February; Semester 5
+// end-exams milestone is set for mid-December. Both are placeholders the
+// user can adjust to their institute's actual dates.
+const GATE_CE_2027 = new Date('2027-02-07T09:00:00+05:30');
+const SEM5_MILESTONE = new Date('2026-12-15T09:00:00+05:30');
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-export default function GoalHeader({ overallProgress }: GoalHeaderProps) {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showInstallBtn, setShowInstallBtn] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const gateExamDate = new Date("2027-02-06T09:30:00").getTime();
+function useCountdown(target: Date) {
+  const [remaining, setRemaining] = useState(() => target.getTime() - Date.now());
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const diff = gateExamDate - now;
-      if (diff > 0) {
-        setTimeLeft({
-          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((diff / 1000 / 60) % 60),
-          seconds: Math.floor((diff / 1000) % 60),
-        });
-      }
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [gateExamDate]);
+    const id = setInterval(() => setRemaining(target.getTime() - Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [target]);
+
+  const clamped = Math.max(remaining, 0);
+  const days = Math.floor(clamped / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((clamped / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((clamped / (1000 * 60)) % 60);
+  const seconds = Math.floor((clamped / 1000) % 60);
+
+  return { days, hours, minutes, seconds, expired: remaining <= 0 };
+}
+
+function CountdownCard({ label, target }: { label: string; target: Date }) {
+  const { days, hours, minutes, seconds, expired } = useCountdown(target);
+  return (
+    <div className="flex-1 min-w-[140px] rounded-xl border-2 border-maroon bg-cream px-3 py-2 shadow-blockSm">
+      <p className="text-[10px] uppercase tracking-wide text-maroon/70 font-mono-tight">{label}</p>
+      {expired ? (
+        <p className="font-mono-tight text-lg font-bold text-burnt">DUE NOW</p>
+      ) : (
+        <p className="font-mono-tight text-xl font-bold text-choc tabular-nums">
+          {days}
+          <span className="text-xs font-normal text-choc/60">d </span>
+          {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:
+          {String(seconds).padStart(2, '0')}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export default function GoalHeader() {
+  const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installed, setInstalled] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
-    const handler = (e: Event) => {
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    setInstalled(isStandalone);
+
+    const onBeforeInstall = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
-      setShowInstallBtn(true);
+      setInstallEvent(e as BeforeInstallPromptEvent);
+    };
+    const onInstalled = () => {
+      setInstalled(true);
+      setInstallEvent(null);
     };
 
-    const isStandalone =
-      window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone;
-    if (isStandalone) {
-      setShowInstallBtn(false);
-    } else {
-      window.addEventListener("beforeinstallprompt", handler);
-    }
-
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBeforeInstall);
+      window.removeEventListener('appinstalled', onInstalled);
+    };
   }, []);
 
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      setShowInstallBtn(false);
-      setDeferredPrompt(null);
-    }
-  };
+  async function handleInstall() {
+    if (!installEvent) return;
+    await installEvent.prompt();
+    const choice = await installEvent.userChoice;
+    if (choice.outcome === 'accepted') setInstalled(true);
+    setInstallEvent(null);
+  }
 
-  const handleForceUpdate = async () => {
-    setIsUpdating(true);
-    if ("caches" in window) {
-      const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map((c) => caches.delete(c)));
-    }
-    if ("serviceWorker" in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      for (const reg of registrations) {
-        await reg.unregister();
+  async function handleSync() {
+    setSyncing(true);
+    try {
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg) {
+          reg.active?.postMessage('SKIP_WAITING');
+          await reg.update();
+        }
       }
+    } finally {
+      window.location.reload();
     }
-    window.location.reload();
-  };
+  }
+
+  const showInstall = !!installEvent && !installed;
 
   return (
-    <header className="border-b-4 border-[#7a1c00] bg-[#7a1c00] text-[#fffdfa] p-3 sm:p-4 rounded-b-3xl shadow-[4px_4px_0px_0px_#2c0d0d]">
-      <div className="max-w-7xl mx-auto flex flex-col gap-2.5">
-        {/* User Profile Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 bg-[#6b1900] border-2 border-[#d48806] p-2.5 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-[#d48806] text-[#2c0d0d] font-black flex items-center justify-center border-2 border-[#fffdfa] text-xs">
-              SK
-            </div>
-            <div>
-              <h2 className="text-xs sm:text-sm font-black tracking-wide text-[#fffdfa] font-mono-code">
-                Suman Kumar Mahato
-              </h2>
-              <p className="text-[10px] text-[#f5d6a8] font-mono-code">
-                ज्ञानं परमं बलम् // GATE CE 2027
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {showInstallBtn && (
-              <button
-                onClick={handleInstallClick}
-                className="bg-[#d48806] text-[#2c0d0d] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#2c0d0d] shadow-sm animate-pulse flex items-center gap-1 active:scale-95"
-              >
-                <DownloadCloud className="w-3.5 h-3.5" /> INSTALL APP
-              </button>
-            )}
-
-            <button
-              onClick={handleForceUpdate}
-              disabled={isUpdating}
-              className="bg-[#d96b1b] text-white px-2.5 py-1 rounded-xl border-2 border-[#2c0d0d] font-black text-[10px] flex items-center gap-1 shadow-sm transition-all active:scale-95"
-            >
-              <span>POWAI SYNC</span>
-              <RefreshCw className={`w-3 h-3 text-[#ffe600] ${isUpdating ? "animate-spin" : ""}`} />
-            </button>
-          </div>
+    <header className="relative z-10 border-b-2 border-maroon bg-cream px-3 pt-3 pb-3 sm:px-5">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="font-mono-tight text-[10px] text-maroon inline-block rounded-md border-2 border-maroon bg-gold/20 px-2 py-0.5 mb-1.5">
+            [ SUMANVOLT // COMMAND_CENTER_v2.7 ]
+          </p>
+          <h1 className="font-serif text-xl font-semibold leading-tight text-choc sm:text-2xl">
+            Suman Kumar Mahato
+          </h1>
+          <p className="font-serif text-sm italic text-maroon/80">
+            ज्ञानं परमं बलम् <span className="not-italic text-choc/50">//</span> IIT Bombay M.Tech
+          </p>
         </div>
 
-        {/* Status Grid Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 font-mono-code text-xs">
-          {/* Benchmarks Card */}
-          <div className="bg-[#6b1900] border-2 border-[#d48806] p-3 rounded-2xl flex flex-col justify-between shadow-sm">
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-black text-[#f5d6a8] flex items-center gap-1">
-                <Target className="w-3.5 h-3.5 text-[#d48806]" /> BENCHMARK
-              </span>
-              <span className="text-[9px] bg-[#d48806] text-[#2c0d0d] font-black px-1.5 py-0.5 rounded-md">AIR &lt; 150</span>
-            </div>
-            <div className="space-y-1 text-[11px] font-bold text-[#fffdfa]">
-              <div className="flex justify-between border-b border-[#fffdfa]/10 pb-0.5">
-                <span>IIT Bombay (Structures/Geo):</span>
-                <span className="text-[#ffe600] font-black">~72+ Marks</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Target Mission:</span>
-                <span className="text-[#10b981] font-black">70+ Marks</span>
-              </div>
-            </div>
-          </div>
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          {showInstall && (
+            <button
+              onClick={handleInstall}
+              className="flex items-center gap-1 rounded-xl border-2 border-maroon bg-burnt px-2.5 py-1.5 font-mono-tight text-[11px] font-bold text-cream shadow-blockSm active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+            >
+              <Download size={13} strokeWidth={2.5} />
+              INSTALL APP
+            </button>
+          )}
+          <button
+            onClick={handleSync}
+            className="flex items-center gap-1 rounded-xl border-2 border-maroon bg-cream px-2.5 py-1.5 font-mono-tight text-[11px] font-bold text-maroon shadow-blockSm active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+          >
+            <RefreshCw size={13} strokeWidth={2.5} className={syncing ? 'animate-spin' : ''} />
+            POWAI SYNC
+          </button>
+        </div>
+      </div>
 
-          {/* Countdown Card */}
-          <div className="bg-[#6b1900] border-2 border-[#d48806] p-3 rounded-2xl flex flex-col justify-between shadow-sm">
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-black text-[#f5d6a8] flex items-center gap-1">
-                <Timer className="w-3.5 h-3.5" /> GATE CE 2027
-              </span>
-              <span className="text-[9px] text-[#f5d6a8] font-bold">06 FEB 2027</span>
-            </div>
-            <div className="grid grid-cols-4 gap-1 text-center my-0.5">
-              <div className="bg-[#2c0d0d] border border-[#d48806]/40 p-1 rounded-lg">
-                <div className="text-sm font-black text-[#ffe600]">{timeLeft.days}</div>
-                <div className="text-[7px] text-slate-300">DAYS</div>
-              </div>
-              <div className="bg-[#2c0d0d] border border-[#d48806]/40 p-1 rounded-lg">
-                <div className="text-sm font-black text-white">{timeLeft.hours}</div>
-                <div className="text-[7px] text-slate-300">HRS</div>
-              </div>
-              <div className="bg-[#2c0d0d] border border-[#d48806]/40 p-1 rounded-lg">
-                <div className="text-sm font-black text-white">{timeLeft.minutes}</div>
-                <div className="text-[7px] text-slate-300">MIN</div>
-              </div>
-              <div className="bg-[#2c0d0d] border border-[#d48806]/40 p-1 rounded-lg">
-                <div className="text-sm font-black text-[#10b981]">{timeLeft.seconds}</div>
-                <div className="text-[7px] text-slate-300">SEC</div>
-              </div>
-            </div>
-            <div className="text-[9px] text-[#f5d6a8] flex justify-between mt-1">
-              <span>Target Admission:</span>
-              <span className="text-[#ffe600] font-black">IIT Bombay M.Tech</span>
-            </div>
-          </div>
-
-          {/* Readiness Card */}
-          <div className="bg-[#6b1900] border-2 border-[#d48806] p-3 rounded-2xl flex flex-col justify-between shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="font-black text-[#f5d6a8] flex items-center gap-1">
-                <Flame className="w-3.5 h-3.5 text-[#d48806]" /> READINESS
-              </span>
-              <span className="text-base font-black text-[#ffe600]">{overallProgress}%</span>
-            </div>
-            <div className="w-full bg-[#2c0d0d] h-3 rounded-full overflow-hidden border border-[#d48806]/40 my-1.5">
-              <motion.div
-                className="h-full bg-gradient-to-r from-[#d48806] to-[#d96b1b]"
-                animate={{ width: `${overallProgress}%` }}
-              />
-            </div>
-            <div className="flex justify-between text-[10px] font-black text-[#f5d6a8]">
-              <span>Ground Zero</span>
-              <span>70+ Non-Negotiable</span>
-            </div>
-          </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <CountdownCard label="GATE CE 2027" target={GATE_CE_2027} />
+        <CountdownCard label="SEM 5 MILESTONE" target={SEM5_MILESTONE} />
+        <div className="flex-1 min-w-[140px] rounded-xl border-2 border-maroon bg-maroon px-3 py-2 shadow-[4px_4px_0px_0px_#d48806]">
+          <p className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-gold/90 font-mono-tight">
+            <Target size={11} strokeWidth={2.5} />
+            Target
+          </p>
+          <p className="font-mono-tight text-xl font-bold text-cream">
+            70<span className="text-sm font-normal text-cream/70">+ marks</span>
+          </p>
+          <p className="font-mono-tight text-[10px] text-gold">AIR &lt; 150</p>
         </div>
       </div>
     </header>

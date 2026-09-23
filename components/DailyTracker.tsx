@@ -1,104 +1,199 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Plus, Minus, CheckCircle, Flame } from "lucide-react";
+import { useEffect, useMemo, useState } from 'react';
+import { Minus, Plus, Footprints, BrainCircuit } from 'lucide-react';
+import { DayLog, WeekLog } from '@/lib/types';
+import { addDays, getWeekStart, loadState, saveState, toISODate } from '@/lib/storage';
+
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const STORAGE_KEY = 'dailyTracker';
+
+function emptyDay(date: string): DayLog {
+  return { date, studyHours: 0, screenHours: 0, walked: false, activeRetrieval: false };
+}
+
+function emptyWeek(weekStart: string): WeekLog {
+  const days: Record<string, DayLog> = {};
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(weekStart, i);
+    days[d] = emptyDay(d);
+  }
+  return { weekStart, days };
+}
 
 export default function DailyTracker() {
-  const [studyHours, setStudyHours] = useState(5.0);
-  const [phoneHours, setPhoneHours] = useState(1.5);
-  const [blankRecall, setBlankRecall] = useState(false);
-  const [savedMsg, setSavedMsg] = useState(false);
+  const todayISO = toISODate(new Date());
+  const currentWeekStart = getWeekStart(new Date());
 
+  const [week, setWeek] = useState<WeekLog>(() => emptyWeek(currentWeekStart));
+  const [selectedDate, setSelectedDate] = useState<string>(todayISO);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Hydrate from storage, rolling over into a fresh week if one has elapsed.
   useEffect(() => {
-    const saved = localStorage.getItem("suman_editorial_daily_v1");
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        setStudyHours(data.studyHours ?? 5.0);
-        setPhoneHours(data.phoneHours ?? 1.5);
-        setBlankRecall(data.blankRecall ?? false);
-      } catch (e) {}
+    const stored = loadState<WeekLog | null>(STORAGE_KEY, null);
+    if (stored && stored.weekStart === currentWeekStart) {
+      setWeek(stored);
+    } else {
+      setWeek(emptyWeek(currentWeekStart));
     }
+    setHydrated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveToday = (sh: number, ph: number, br: boolean) => {
-    setStudyHours(sh);
-    setPhoneHours(ph);
-    setBlankRecall(br);
-    localStorage.setItem(
-      "suman_editorial_daily_v1",
-      JSON.stringify({ studyHours: sh, phoneHours: ph, blankRecall: br })
-    );
-    setSavedMsg(true);
-    setTimeout(() => setSavedMsg(false), 1200);
-  };
+  useEffect(() => {
+    if (hydrated) saveState(STORAGE_KEY, week);
+  }, [week, hydrated]);
+
+  const selectedDay = week.days[selectedDate] ?? emptyDay(selectedDate);
+
+  function updateDay(patch: Partial<DayLog>) {
+    setWeek((w) => ({
+      ...w,
+      days: {
+        ...w.days,
+        [selectedDate]: { ...(w.days[selectedDate] ?? emptyDay(selectedDate)), ...patch },
+      },
+    }));
+  }
+
+  const weekTotals = useMemo(() => {
+    const values = Object.values(week.days);
+    const studyTotal = values.reduce((s, d) => s + d.studyHours, 0);
+    const walkedDays = values.filter((d) => d.walked).length;
+    const retrievalDays = values.filter((d) => d.activeRetrieval).length;
+    return { studyTotal, walkedDays, retrievalDays };
+  }, [week]);
+
+  const screenGood = selectedDay.screenHours <= 2.0;
 
   return (
-    <div className="bg-[#fffdfa] border-2 border-[#7a1c00] p-3 sm:p-4 rounded-2xl shadow-[4px_4px_0px_0px_#7a1c00] space-y-3">
-      <div className="flex items-center justify-between border-b-2 border-[#7a1c00]/20 pb-2">
-        <div className="flex items-center gap-2 text-xs font-black text-[#7a1c00] font-mono-code">
-          <Flame className="w-4 h-4 text-[#d48806]" /> DAILY HABIT MOMENTUM PROTOCOL
+    <div className="flex h-full flex-col gap-3 p-3 sm:p-4">
+      {/* Week strip */}
+      <div className="rounded-2xl border-2 border-maroon bg-cream p-2.5 shadow-block">
+        <div className="mb-1.5 flex items-center justify-between font-mono-tight text-[10px] text-maroon/70">
+          <span>WEEK OF {week.weekStart}</span>
+          <span>{weekTotals.studyTotal.toFixed(1)}h logged</span>
         </div>
-        {savedMsg && <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 font-bold rounded-lg">SAVED ✓</span>}
+        <div className="grid grid-cols-7 gap-1.5">
+          {DAY_LABELS.map((label, i) => {
+            const date = addDays(week.weekStart, i);
+            const day = week.days[date] ?? emptyDay(date);
+            const isSelected = date === selectedDate;
+            const isToday = date === todayISO;
+            return (
+              <button
+                key={date}
+                onClick={() => setSelectedDate(date)}
+                className={`flex flex-col items-center rounded-lg border-2 py-1.5 font-mono-tight transition-none ${
+                  isSelected
+                    ? 'border-maroon bg-maroon text-cream shadow-blockSm'
+                    : 'border-maroon/30 bg-cream text-choc'
+                }`}
+              >
+                <span className="text-[9px]">{label}</span>
+                <span className={`text-[9px] ${isToday && !isSelected ? 'text-burnt font-bold' : ''}`}>
+                  {isToday ? '•' : day.studyHours > 0 ? day.studyHours : '-'}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono-code">
-        {/* Study Hours */}
-        <div className="bg-[#fff8f0] border-2 border-[#7a1c00] p-3 rounded-xl flex flex-col justify-between shadow-sm">
-          <span className="font-bold text-[#7a1c00]">DEEP STUDY (Target: 5h+)</span>
-          <div className="flex items-center justify-between my-2">
-            <button
-              onClick={() => saveToday(Math.max(0, studyHours - 0.5), phoneHours, blankRecall)}
-              className="w-8 h-8 bg-white border-2 border-[#7a1c00] rounded-xl font-black flex items-center justify-center shadow-sm active:scale-95"
-            >
-              <Minus className="w-4 h-4" />
-            </button>
-            <span className="text-lg font-black text-[#d48806]">{studyHours}h</span>
-            <button
-              onClick={() => saveToday(studyHours + 0.5, phoneHours, blankRecall)}
-              className="w-8 h-8 bg-[#d48806] text-[#2c0d0d] border-2 border-[#7a1c00] rounded-xl font-black flex items-center justify-center shadow-sm active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
-          <span className="text-[10px] text-slate-600">College: 5h | Weekend: 9-10h</span>
-        </div>
+      {/* Selected day editor */}
+      <div className="flex-1 overflow-y-auto scrollbar-none rounded-2xl border-2 border-maroon bg-cream p-3.5 shadow-block">
+        <p className="font-mono-tight text-xs text-maroon/70">
+          EDITING <span className="font-bold text-choc">{selectedDate}</span>
+          {selectedDate === todayISO ? ' (today)' : ''}
+        </p>
 
-        {/* Phone Limit */}
-        <div className="bg-[#fff8f0] border-2 border-[#7a1c00] p-3 rounded-xl flex flex-col justify-between shadow-sm">
-          <span className="font-bold text-[#7a1c00]">PHONE SCREEN TIME (&le; 2.0h)</span>
-          <div className="flex items-center justify-between my-2">
+        {/* Study hours */}
+        <div className="mt-3 rounded-xl border-2 border-maroon/70 bg-cream p-3">
+          <p className="font-serif text-sm text-choc">Study hours</p>
+          <div className="mt-2 flex items-center justify-between">
             <button
-              onClick={() => saveToday(studyHours, Math.max(0, phoneHours - 0.25), blankRecall)}
-              className="w-8 h-8 bg-white border-2 border-[#7a1c00] rounded-xl font-black flex items-center justify-center shadow-sm active:scale-95"
+              onClick={() => updateDay({ studyHours: Math.max(0, Math.round((selectedDay.studyHours - 0.5) * 2) / 2) })}
+              className="grid h-9 w-9 place-items-center rounded-lg border-2 border-maroon bg-cream text-maroon shadow-blockSm active:shadow-none active:translate-x-[1px] active:translate-y-[1px]"
+              aria-label="Decrease study hours"
             >
-              <Minus className="w-4 h-4" />
+              <Minus size={16} strokeWidth={3} />
             </button>
-            <span className={`text-lg font-black ${phoneHours <= 2.0 ? "text-emerald-700" : "text-rose-700"}`}>
-              {phoneHours}h
+            <span className="font-mono-tight text-2xl font-bold text-choc tabular-nums">
+              {selectedDay.studyHours.toFixed(1)}h
             </span>
             <button
-              onClick={() => saveToday(studyHours, phoneHours + 0.25, blankRecall)}
-              className="w-8 h-8 bg-rose-200 text-rose-900 border-2 border-[#7a1c00] rounded-xl font-black flex items-center justify-center shadow-sm active:scale-95"
+              onClick={() => updateDay({ studyHours: Math.min(16, Math.round((selectedDay.studyHours + 0.5) * 2) / 2) })}
+              className="grid h-9 w-9 place-items-center rounded-lg border-2 border-maroon bg-burnt text-cream shadow-blockSm active:shadow-none active:translate-x-[1px] active:translate-y-[1px]"
+              aria-label="Increase study hours"
             >
-              <Plus className="w-4 h-4" />
+              <Plus size={16} strokeWidth={3} />
             </button>
           </div>
-          <span className="text-[10px] text-slate-600">Adjust in 15m intervals</span>
         </div>
 
-        {/* Blank Recall */}
-        <div className="bg-[#fff8f0] border-2 border-[#7a1c00] p-3 rounded-xl flex flex-col justify-between shadow-sm">
-          <span className="font-bold text-[#7a1c00]">ACTIVE RETRIEVAL (11:45 PM)</span>
+        {/* Screen time */}
+        <div className="mt-2.5 rounded-xl border-2 border-maroon/70 bg-cream p-3">
+          <p className="font-serif text-sm text-choc">Phone screen time</p>
+          <div className="mt-2 flex items-center justify-between">
+            <button
+              onClick={() =>
+                updateDay({ screenHours: Math.max(0, Math.round((selectedDay.screenHours - 0.15) * 100) / 100) })
+              }
+              className="grid h-9 w-9 place-items-center rounded-lg border-2 border-maroon bg-cream text-maroon shadow-blockSm active:shadow-none active:translate-x-[1px] active:translate-y-[1px]"
+              aria-label="Decrease screen time"
+            >
+              <Minus size={16} strokeWidth={3} />
+            </button>
+            <span
+              className={`font-mono-tight text-2xl font-bold tabular-nums ${
+                screenGood ? 'text-green-700' : 'text-burnt'
+              }`}
+            >
+              {selectedDay.screenHours.toFixed(2)}h
+            </span>
+            <button
+              onClick={() =>
+                updateDay({ screenHours: Math.min(16, Math.round((selectedDay.screenHours + 0.15) * 100) / 100) })
+              }
+              className="grid h-9 w-9 place-items-center rounded-lg border-2 border-maroon bg-cream text-maroon shadow-blockSm active:shadow-none active:translate-x-[1px] active:translate-y-[1px]"
+              aria-label="Increase screen time"
+            >
+              <Plus size={16} strokeWidth={3} />
+            </button>
+          </div>
+          <p className="mt-1 text-right font-mono-tight text-[10px] text-choc/50">
+            {screenGood ? 'within 2.0h target' : 'over 2.0h target'}
+          </p>
+        </div>
+
+        {/* Toggles */}
+        <div className="mt-2.5 grid grid-cols-2 gap-2.5">
           <button
-            onClick={() => saveToday(studyHours, phoneHours, !blankRecall)}
-            className={`mt-2 py-2 px-3 border-2 border-[#7a1c00] rounded-xl text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all ${
-              blankRecall ? "bg-emerald-700 text-white" : "bg-white text-slate-700"
+            onClick={() => updateDay({ walked: !selectedDay.walked })}
+            className={`flex flex-col items-center gap-1 rounded-xl border-2 border-maroon p-3 shadow-blockSm active:shadow-none active:translate-x-[1px] active:translate-y-[1px] ${
+              selectedDay.walked ? 'bg-maroon text-cream' : 'bg-cream text-choc'
             }`}
           >
-            <CheckCircle className="w-4 h-4" /> {blankRecall ? "COMPLETED ✓" : "MARK BLANK SHEET"}
+            <Footprints size={18} strokeWidth={2.5} />
+            <span className="font-mono-tight text-[10px]">30M WALK</span>
           </button>
-          <span className="text-[10px] text-slate-600 mt-1">Zero-notebook formula dump</span>
+          <button
+            onClick={() => updateDay({ activeRetrieval: !selectedDay.activeRetrieval })}
+            className={`flex flex-col items-center gap-1 rounded-xl border-2 border-maroon p-3 shadow-blockSm active:shadow-none active:translate-x-[1px] active:translate-y-[1px] ${
+              selectedDay.activeRetrieval ? 'bg-maroon text-cream' : 'bg-cream text-choc'
+            }`}
+          >
+            <BrainCircuit size={18} strokeWidth={2.5} />
+            <span className="font-mono-tight text-[10px]">BLANK SHEET</span>
+          </button>
+        </div>
+
+        {/* Week summary */}
+        <div className="mt-3 flex justify-between rounded-xl border-2 border-dashed border-maroon/40 px-3 py-2 font-mono-tight text-[10px] text-choc/70">
+          <span>Walked {weekTotals.walkedDays}/7</span>
+          <span>Retrieval {weekTotals.retrievalDays}/7</span>
+          <span>Total {weekTotals.studyTotal.toFixed(1)}h</span>
         </div>
       </div>
     </div>

@@ -1,14 +1,13 @@
 {
-  "name": "GATE CE 70+ // SUMANVOLT",
-  "short_name": "GATE CE",
-  "description": "Mission 70+ GATE Civil Engineering Command Center",
+  "name": "SUMANVOLT // COMMAND_CENTER",
+  "short_name": "SUMANVOLT",
+  "description": "GATE CE 2027 preparation command center for Suman Kumar Mahato.",
   "start_url": "/",
-  "id": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0b2545",
-  "theme_color": "#0b2545",
   "orientation": "portrait",
+  "background_color": "#fffdfa",
+  "theme_color": "#7a1c00",
   "icons": [
     {
       "src": "/icon-192.png",

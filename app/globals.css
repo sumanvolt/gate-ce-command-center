@@ -1,53 +1,97 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-  --color-iitb-cream: #fffdfa;
-  --color-iitb-maroon: #7a1c00;
-  --color-iitb-gold: #d48806;
-  --color-iitb-orange: #d96b1b;
-  --color-iitb-dark: #2c0d0d;
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: local('JetBrains Mono');
+  font-display: swap;
+}
 
-  --shadow-editorial: 4px 4px 0px 0px #7a1c00;
-  --shadow-editorial-sm: 2px 2px 0px 0px #7a1c00;
+:root {
+  --cream: #fffdfa;
+  --maroon: #7a1c00;
+  --gold: #d48806;
+  --burnt: #d96b1b;
+  --choc: #2c0d0d;
+  color-scheme: light;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+  overscroll-behavior: none;
 }
 
 body {
-  background-color: #fffdfa;
-  color: #2c0d0d;
-  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  -webkit-font-smoothing: antialiased;
+  background-color: var(--cream);
+  color: var(--choc);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
-.font-mono-code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
-
+/* Scrollable inner panels: bars hidden, motion kept */
 .scrollbar-none {
-  -ms-overflow-style: none;
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
 
-/* Eliminate touch outlines on mobile */
-.recharts-wrapper,
-.recharts-wrapper *,
-.recharts-surface,
-.recharts-surface * {
-  outline: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-  user-select: none !important;
+/* Subtle grain texture on the shell background for the editorial-print feel */
+.paper-grain {
+  background-image: radial-gradient(#2c0d0d 0.5px, transparent 0.5px);
+  background-size: 14px 14px;
+  opacity: 0.035;
+  pointer-events: none;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.font-mono-tight {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: -0.01em;
 }
-::-webkit-scrollbar-thumb {
-  background: #7a1c00;
-  border-radius: 4px;
+
+/* Visible keyboard focus, kept crisp rather than a soft glow */
+:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 2px;
 }
-::-webkit-scrollbar-track {
-  background: #fffdfa;
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+input[type='checkbox'].brute-check {
+  appearance: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 2px solid var(--maroon);
+  border-radius: 0.3rem;
+  background: var(--cream);
+  display: inline-grid;
+  place-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+input[type='checkbox'].brute-check::before {
+  content: '';
+  width: 0.65rem;
+  height: 0.65rem;
+  transform: scale(0);
+  transition: transform 0.08s ease-in;
+  box-shadow: inset 1rem 1rem var(--burnt);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+input[type='checkbox'].brute-check:checked::before {
+  transform: scale(1);
 }
