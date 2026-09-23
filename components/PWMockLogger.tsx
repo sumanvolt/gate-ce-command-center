@@ -62,7 +62,7 @@ export default function PWMockLogger({ tests, onAddTest }: PWMockLoggerProps) {
 
     onAddTest({
       id: Date.now().toString(),
-      name: form.name || "PW Test",
+      name: form.name || "Test Log",
       score: total,
       mathAptMarks: ma,
       geotechMarks: geo,
@@ -90,123 +90,129 @@ export default function PWMockLogger({ tests, onAddTest }: PWMockLoggerProps) {
 
   return (
     <div className="space-y-4">
+      {/* Test Log Form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white border-2 border-[#0b2545] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#0b2545] space-y-3"
+        className="bg-[#fffdfa] border-2 border-[#7a1c00] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#7a1c00] space-y-3"
       >
-        <div className="flex items-center gap-2 border-b-2 border-[#0b2545] pb-2 font-black text-xs text-[#0b2545]">
-          <TrendingUp className="w-4 h-4 text-[#e0a96d]" /> LOG GATE CE / PW MOCK TEST
+        <div className="flex items-center gap-2 border-b-2 border-[#7a1c00]/20 pb-2 font-black text-xs text-[#7a1c00] font-mono-code">
+          <TrendingUp className="w-4 h-4 text-[#d48806]" /> LOG MOCK TEST RESULTS
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono-code">
           <input
             type="text"
             required
-            placeholder="Test Name (e.g. Geotech Part Test 01)"
+            placeholder="Test Name (e.g. Geotech Part 1)"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="border-2 border-[#0b2545] p-2 outline-none font-bold"
+            className="border-2 border-[#7a1c00] rounded-xl p-2 bg-[#fff8f0] outline-none font-bold text-[#2c0d0d]"
           />
           <input
             type="date"
             required
             value={form.testDate}
             onChange={(e) => setForm({ ...form, testDate: e.target.value })}
-            className="border-2 border-[#0b2545] p-2 outline-none font-bold"
+            className="border-2 border-[#7a1c00] rounded-xl p-2 bg-[#fff8f0] outline-none font-bold text-[#2c0d0d]"
           />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono-code">
           <div>
-            <label className="text-[10px] font-bold text-slate-600 block">Math + Apt (/28)</label>
+            <label className="text-[10px] font-bold text-slate-600 block mb-1">Math + Apt (/28)</label>
             <input
               type="number"
               step="0.1"
               placeholder="22.0"
               value={form.mathApt}
               onChange={(e) => setForm({ ...form, mathApt: e.target.value })}
-              className="border-2 border-[#0b2545] p-1.5 w-full outline-none font-bold"
+              className="border-2 border-[#7a1c00] rounded-xl p-2 bg-[#fff8f0] w-full outline-none font-bold text-[#2c0d0d]"
             />
           </div>
           <div>
-            <label className="text-[10px] font-bold text-slate-600 block">Geotech (/15)</label>
+            <label className="text-[10px] font-bold text-slate-600 block mb-1">Geotech (/15)</label>
             <input
               type="number"
               step="0.1"
               placeholder="12.5"
               value={form.geotech}
               onChange={(e) => setForm({ ...form, geotech: e.target.value })}
-              className="border-2 border-[#0b2545] p-1.5 w-full outline-none font-bold"
+              className="border-2 border-[#7a1c00] rounded-xl p-2 bg-[#fff8f0] w-full outline-none font-bold text-[#2c0d0d]"
             />
           </div>
           <div>
-            <label className="text-[10px] font-bold text-slate-600 block">Env (/11)</label>
+            <label className="text-[10px] font-bold text-slate-600 block mb-1">Env (/11)</label>
             <input
               type="number"
               step="0.1"
               placeholder="9.0"
               value={form.env}
               onChange={(e) => setForm({ ...form, env: e.target.value })}
-              className="border-2 border-[#0b2545] p-1.5 w-full outline-none font-bold"
+              className="border-2 border-[#7a1c00] rounded-xl p-2 bg-[#fff8f0] w-full outline-none font-bold text-[#2c0d0d]"
             />
           </div>
           <div>
-            <label className="text-[10px] font-bold text-slate-600 block">Other Civil (/46)</label>
+            <label className="text-[10px] font-bold text-slate-600 block mb-1">Other Civil (/46)</label>
             <input
               type="number"
               step="0.1"
               placeholder="28.0"
               value={form.other}
               onChange={(e) => setForm({ ...form, other: e.target.value })}
-              className="border-2 border-[#0b2545] p-1.5 w-full outline-none font-bold"
+              className="border-2 border-[#7a1c00] rounded-xl p-2 bg-[#fff8f0] w-full outline-none font-bold text-[#2c0d0d]"
             />
           </div>
         </div>
 
         <div>
-          <label className="text-[10px] font-bold text-rose-600 block">Negatives Lost</label>
+          <label className="text-[10px] font-bold text-rose-700 block mb-1">Negatives Lost</label>
           <input
             type="number"
             step="0.33"
             placeholder="-3.33"
             value={form.negatives}
             onChange={(e) => setForm({ ...form, negatives: e.target.value })}
-            className="border-2 border-[#0b2545] p-1.5 w-full outline-none font-bold text-xs font-mono"
+            className="border-2 border-[#7a1c00] rounded-xl p-2 bg-[#fff8f0] w-full outline-none font-bold text-xs font-mono-code text-[#2c0d0d]"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-[#e0a96d] hover:bg-[#f5d6a8] text-[#0b2545] font-black py-2 border-2 border-[#0b2545] shadow-[2px_2px_0px_0px_#0b2545]"
+          className="w-full bg-[#d48806] hover:bg-[#d96b1b] hover:text-white transition-colors text-[#2c0d0d] font-black py-2.5 rounded-xl border-2 border-[#7a1c00] shadow-sm active:scale-[0.98]"
         >
           + SAVE TEST LOG
         </button>
       </form>
 
+      {/* Performance Trajectory Graph */}
       {tests.length > 0 && (
-        <div className="bg-white border-2 border-[#0b2545] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#0b2545]">
-          <div className="text-xs font-black text-[#0b2545] mb-2 flex justify-between">
-            <span>POWAI TARGET TRAJECTORY</span>
-            <span className="text-emerald-600 font-bold">TARGET: 70+ MARKS</span>
+        <div className="bg-[#fffdfa] border-2 border-[#7a1c00] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#7a1c00]">
+          <div className="text-xs font-black text-[#7a1c00] mb-2 flex justify-between font-mono-code">
+            <span>PERFORMANCE TRAJECTORY</span>
+            <span className="text-[#d96b1b]">TARGET: 70+ MARKS</span>
           </div>
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
-                <XAxis dataKey="date" stroke="#0b2545" fontSize={10} />
-                <YAxis domain={[0, 100]} stroke="#0b2545" fontSize={10} />
-                <Tooltip />
+                <XAxis dataKey="date" stroke="#7a1c00" fontSize={10} tickLine={false} axisLine={{ strokeWidth: 2 }} />
+                <YAxis domain={[0, 100]} stroke="#7a1c00" fontSize={10} tickLine={false} axisLine={{ strokeWidth: 2 }} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#fffdfa', border: '2px solid #7a1c00', borderRadius: '12px', fontFamily: 'monospace', fontSize: '12px' }}
+                  itemStyle={{ color: '#2c0d0d', fontWeight: 'bold' }}
+                />
                 <ReferenceLine
                   y={70}
-                  stroke="#ef4444"
-                  strokeDasharray="3 3"
-                  label={{ value: "70M Cutoff", fill: "#ef4444", fontSize: 10 }}
+                  stroke="#d96b1b"
+                  strokeDasharray="4 4"
+                  label={{ value: "70M Target", fill: "#d96b1b", fontSize: 10, fontWeight: "bold", position: 'insideTopLeft' }}
                 />
                 <Line
                   type="monotone"
                   dataKey="score"
-                  stroke="#134074"
+                  stroke="#7a1c00"
                   strokeWidth={3}
-                  dot={{ fill: "#e0a96d", r: 4 }}
+                  dot={{ fill: "#d48806", stroke: "#7a1c00", strokeWidth: 2, r: 5 }}
+                  activeDot={{ r: 7, fill: "#d96b1b", stroke: "#7a1c00" }}
                 />
               </LineChart>
             </ResponsiveContainer>
