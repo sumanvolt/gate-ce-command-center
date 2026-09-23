@@ -11,8 +11,8 @@
   --color-iitb-emerald: #10b981;
   --color-iitb-crimson: #ef4444;
 
-  --shadow-neo: 4px 4px 0px 0px #0b2545;
-  --shadow-neo-sm: 2px 2px 0px 0px #0b2545;
+  --shadow-iitb: 4px 4px 0px 0px #0b2545;
+  --shadow-iitb-sm: 2px 2px 0px 0px #0b2545;
 }
 
 body {
@@ -22,6 +22,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Touch focus outline suppression for mobile charts */
 .recharts-wrapper,
 .recharts-wrapper *,
 .recharts-surface,
