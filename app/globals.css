@@ -1,35 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  --color-iitb-crest: #0b2545;
-  --color-iitb-crest-dark: #061628;
-  --color-iitb-lake: #134074;
-  --color-iitb-slate: #8da9c4;
-  --color-iitb-subtle: #eef4f8;
-  --color-iitb-gold: #e0a96d;
-  --color-iitb-gold-light: #f5d6a8;
-  --color-iitb-emerald: #10b981;
-  --color-iitb-crimson: #ef4444;
+  --color-iitb-cream: #fffdfa;
+  --color-iitb-maroon: #7a1c00;
+  --color-iitb-gold: #d48806;
+  --color-iitb-orange: #d96b1b;
+  --color-iitb-dark: #2c0d0d;
 
-  --shadow-iitb: 4px 4px 0px 0px #0b2545;
-  --shadow-iitb-sm: 2px 2px 0px 0px #0b2545;
+  --shadow-editorial: 4px 4px 0px 0px #7a1c00;
+  --shadow-editorial-sm: 2px 2px 0px 0px #7a1c00;
 }
 
 body {
-  background-color: #eef4f8;
-  color: #0b2545;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background-color: #fffdfa;
+  color: #2c0d0d;
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Touch focus outline suppression for mobile charts */
-.recharts-wrapper,
-.recharts-wrapper *,
-.recharts-surface,
-.recharts-surface * {
-  outline: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-  user-select: none !important;
+.font-mono-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .scrollbar-none {
@@ -41,12 +31,13 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #0b2545;
+  background: #7a1c00;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #eef4f8;
+  background: #fffdfa;
 }

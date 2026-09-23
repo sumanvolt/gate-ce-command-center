@@ -76,30 +76,29 @@ export default function GoalHeader({ overallProgress }: GoalHeaderProps) {
   };
 
   return (
-    <header className="border-b-4 border-[#0b2545] bg-[#0b2545] text-white p-3 sm:p-5 shadow-[4px_4px_0px_0px_#0b2545]">
-      <div className="max-w-7xl mx-auto flex flex-col gap-3">
-        {/* Brand Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 max-w-full">
-            <div className="flex items-center border-2 border-[#e0a96d] bg-[#061628] shadow-[2px_2px_0px_0px_#e0a96d] overflow-hidden whitespace-nowrap">
-              <span className="bg-[#e0a96d] text-[#0b2545] text-[10px] sm:text-xs font-black px-2 py-1 tracking-wider flex items-center gap-1.5">
-                <span>🏛️</span> IIT BOMBAY
-              </span>
-              <span className="text-[#f5d6a8] text-[9px] sm:text-[11px] font-mono font-bold px-2 py-1">
-                SUMANVOLT // CE
-              </span>
+    <header className="border-b-4 border-[#7a1c00] bg-[#7a1c00] text-[#fffdfa] p-3 sm:p-4 rounded-b-2xl shadow-[4px_4px_0px_0px_#2c0d0d]">
+      <div className="max-w-7xl mx-auto flex flex-col gap-2.5">
+        {/* Top Profile & Brand Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-2 bg-[#6b1900] border-2 border-[#d48806] p-2.5 rounded-xl shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-[#d48806] text-[#2c0d0d] font-black flex items-center justify-center border-2 border-[#fffdfa] text-xs">
+              SK
             </div>
-
-            <span className="hidden sm:inline-block bg-[#134074] text-[#f5d6a8] font-black text-xs px-2.5 py-1 border-2 border-[#8da9c4]">
-              ज्ञानं परमं बलम्
-            </span>
+            <div>
+              <h1 className="text-xs sm:text-sm font-black tracking-wide text-[#fffdfa] font-mono-code">
+                Suman Kumar Mahato
+              </h1>
+              <p className="text-[10px] text-[#f5d6a8] font-mono-code">
+                ज्ञानं परमं बलम् // IIT Bombay M.Tech
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
             {showInstallBtn && (
               <button
                 onClick={handleInstallClick}
-                className="bg-[#e0a96d] hover:bg-[#f5d6a8] text-[#0b2545] text-[10px] sm:text-xs font-black px-2.5 py-1 border-2 border-[#0b2545] shadow-[2px_2px_0px_0px_#0b2545] flex items-center gap-1 animate-pulse"
+                className="bg-[#d48806] text-[#2c0d0d] text-[10px] font-black px-2.5 py-1 rounded-lg border-2 border-[#2c0d0d] shadow-sm animate-pulse flex items-center gap-1"
               >
                 <DownloadCloud className="w-3.5 h-3.5" /> INSTALL APP
               </button>
@@ -108,95 +107,38 @@ export default function GoalHeader({ overallProgress }: GoalHeaderProps) {
             <button
               onClick={handleForceUpdate}
               disabled={isUpdating}
-              className="bg-[#134074] hover:bg-[#1d4e89] text-[#eef4f8] px-2.5 py-1 border-2 border-[#e0a96d] font-black text-[10px] sm:text-xs shadow-[2px_2px_0px_0px_#e0a96d] flex items-center gap-1.5 whitespace-nowrap transition-all"
+              className="bg-[#d96b1b] text-white px-2 py-1 rounded-lg border-2 border-[#2c0d0d] font-black text-[10px] flex items-center gap-1 shadow-sm transition-all"
             >
-              <span className="w-2 h-2 rounded-full bg-[#10b981]"></span>
-              <span>POWAI SYNC</span>
-              <RefreshCw className={`w-3 h-3 text-[#e0a96d] ${isUpdating ? "animate-spin" : ""}`} />
+              <span>SYNC</span>
+              <RefreshCw className={`w-3 h-3 text-[#ffe600] ${isUpdating ? "animate-spin" : ""}`} />
             </button>
           </div>
         </div>
 
-        {/* Motivational Banner */}
-        <div className="bg-[#134074] text-[#f5d6a8] border-2 border-[#e0a96d] px-3 py-1.5 shadow-[2px_2px_0px_0px_#0b2545] flex items-center gap-2 text-xs font-bold">
-          <Compass className="w-4 h-4 text-[#e0a96d] shrink-0" />
-          <span>&quot;From Lecture Hall to Powai Convocation: Master Geotech &amp; Structures. 70+ Marks is Non-Negotiable.&quot;</span>
-        </div>
-
-        {/* 3 Status Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="bg-white text-[#0b2545] border-2 border-[#0b2545] p-3 shadow-[4px_4px_0px_0px_#e0a96d] flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-black tracking-wider text-[#0b2545] flex items-center gap-1.5">
-                <Target className="w-4 h-4 text-[#134074]" /> IIT BOMBAY CUTOFFS
-              </span>
-              <span className="text-[10px] bg-[#e0a96d] text-[#0b2545] border border-[#0b2545] font-black px-1.5">AIR &lt; 150</span>
-            </div>
-            <div className="space-y-1 text-xs font-bold">
-              <div className="flex justify-between border-b border-[#0b2545]/15 pb-0.5">
-                <span>Structural Engineering:</span>
-                <span className="text-[#0b2545] font-black">~74+ Marks</span>
-              </div>
-              <div className="flex justify-between border-b border-[#0b2545]/15 pb-0.5">
-                <span>Geotechnical Engineering:</span>
-                <span className="text-[#0b2545] font-black">~70+ Marks</span>
-              </div>
-              <div className="flex justify-between">
-                <span>WRE / Transportation / Env:</span>
-                <span className="text-[#10b981] font-black">~66+ Marks</span>
-              </div>
-            </div>
+        {/* Compact Metrics Strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono-code">
+          <div className="bg-[#6b1900] border-2 border-[#d48806] p-2 rounded-xl">
+            <span className="text-[9px] text-[#f5d6a8] block">GATE CE 2027</span>
+            <span className="text-sm sm:text-base font-black text-[#ffe600]">{timeLeft.days}D : {timeLeft.hours}H</span>
           </div>
-
-          <div className="bg-[#061628] text-white border-2 border-[#e0a96d] p-3 shadow-[4px_4px_0px_0px_#0b2545] flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-black text-[#e0a96d] flex items-center gap-1.5">
-                <Timer className="w-4 h-4" /> GATE CE 2027
-              </span>
-              <span className="text-[10px] text-[#8da9c4] font-bold">06 FEB 2027</span>
-            </div>
-            <div className="grid grid-cols-4 gap-1 text-center my-1">
-              <div className="bg-[#0b2545] border border-[#e0a96d]/40 p-1">
-                <div className="text-base sm:text-lg font-black text-[#e0a96d]">{timeLeft.days}</div>
-                <div className="text-[8px] text-[#8da9c4]">DAYS</div>
-              </div>
-              <div className="bg-[#0b2545] border border-[#e0a96d]/40 p-1">
-                <div className="text-base sm:text-lg font-black text-white">{timeLeft.hours}</div>
-                <div className="text-[8px] text-[#8da9c4]">HRS</div>
-              </div>
-              <div className="bg-[#0b2545] border border-[#e0a96d]/40 p-1">
-                <div className="text-base sm:text-lg font-black text-white">{timeLeft.minutes}</div>
-                <div className="text-[8px] text-[#8da9c4]">MIN</div>
-              </div>
-              <div className="bg-[#0b2545] border border-[#e0a96d]/40 p-1">
-                <div className="text-base sm:text-lg font-black text-[#10b981]">{timeLeft.seconds}</div>
-                <div className="text-[8px] text-[#8da9c4]">SEC</div>
-              </div>
-            </div>
-            <div className="text-[10px] text-[#f5d6a8] flex justify-between mt-0.5">
-              <span>Target Benchmark:</span>
-              <span className="text-[#10b981] font-black">70+ Marks Non-Negotiable</span>
-            </div>
+          <div className="bg-[#6b1900] border-2 border-[#d48806] p-2 rounded-xl">
+            <span className="text-[9px] text-[#f5d6a8] block">BENCHMARK</span>
+            <span className="text-sm sm:text-base font-black text-[#fffdfa]">70+ MARKS</span>
           </div>
-
-          <div className="bg-[#134074] text-white border-2 border-[#0b2545] p-3 shadow-[4px_4px_0px_0px_#e0a96d] flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black tracking-wider text-[#f5d6a8] flex items-center gap-1.5">
-                <Flame className="w-4 h-4 text-[#e0a96d]" /> 70+ MARKS READINESS
-              </span>
-              <span className="text-lg font-black text-white">{overallProgress}%</span>
+          <div className="bg-[#6b1900] border-2 border-[#d48806] p-2 rounded-xl">
+            <span className="text-[9px] text-[#f5d6a8] block">TARGET ADMISSION</span>
+            <span className="text-sm sm:text-base font-black text-[#ffe600]">AIR &lt; 150</span>
+          </div>
+          <div className="bg-[#6b1900] border-2 border-[#d48806] p-2 rounded-xl flex flex-col justify-between">
+            <div className="flex justify-between text-[9px] text-[#f5d6a8]">
+              <span>READINESS</span>
+              <span className="text-emerald-300 font-bold">{overallProgress}%</span>
             </div>
-            <div className="w-full bg-[#0b2545] border-2 border-[#e0a96d] h-4 sm:h-5 my-1.5 relative overflow-hidden">
+            <div className="w-full bg-[#2c0d0d] h-2 rounded-full overflow-hidden border border-[#d48806]/40 mt-1">
               <motion.div
-                className="h-full bg-gradient-to-r from-[#e0a96d] to-[#10b981]"
-                initial={{ width: 0 }}
+                className="h-full bg-gradient-to-r from-[#d48806] to-[#d96b1b]"
                 animate={{ width: `${overallProgress}%` }}
-                transition={{ type: "spring", stiffness: 60 }}
               />
-            </div>
-            <div className="flex justify-between text-[10px] font-black text-[#f5d6a8]">
-              <span>Ground Zero</span>
-              <span>Target: 70+ Marks</span>
             </div>
           </div>
         </div>

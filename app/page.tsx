@@ -7,11 +7,11 @@ import SyllabusTracker, { GateSubjectGroup, GateSubTopic } from "@/components/Sy
 import PWMockLogger, { GateMockEntry } from "@/components/PWMockLogger";
 import { RotateCcw } from "lucide-react";
 
-export const IITB_CIVIL_SYLLABUS: GateSubjectGroup[] = [
+export const EDITORIAL_IITB_SYLLABUS: GateSubjectGroup[] = [
   {
     key: "geotech",
     title: "Geotechnical Engineering",
-    marks: "~14-16 Marks [Core Trinity]",
+    marks: "~14-16 Marks [80/20 Trinity]",
     chapters: [
       {
         id: "geo-c1",
@@ -46,7 +46,7 @@ export const IITB_CIVIL_SYLLABUS: GateSubjectGroup[] = [
   {
     key: "env",
     title: "Environmental Engineering",
-    marks: "~10-12 Marks [Core Trinity]",
+    marks: "~10-12 Marks [80/20 Trinity]",
     chapters: [
       {
         id: "env-c1",
@@ -62,7 +62,7 @@ export const IITB_CIVIL_SYLLABUS: GateSubjectGroup[] = [
 ];
 
 export default function GateDashboard() {
-  const [subjects, setSubjects] = useState<GateSubjectGroup[]>(IITB_CIVIL_SYLLABUS);
+  const [subjects, setSubjects] = useState<GateSubjectGroup[]>(EDITORIAL_IITB_SYLLABUS);
   const [gateTests, setGateTests] = useState<GateMockEntry[]>([]);
   const [activeTab, setActiveTab] = useState<"habits" | "syllabus" | "mocks">("habits");
 
@@ -70,13 +70,13 @@ export default function GateDashboard() {
   const [mockHistory, setMockHistory] = useState<GateMockEntry[][]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("suman_gate_ce_singleface_v2");
+    const saved = localStorage.getItem("suman_editorial_syllabus_v1");
     if (saved) {
       try {
         setSubjects(JSON.parse(saved));
       } catch (e) {}
     }
-    const savedMocks = localStorage.getItem("suman_gate_ce_mocks_singleface_v2");
+    const savedMocks = localStorage.getItem("suman_editorial_mocks_v1");
     if (savedMocks) {
       try {
         setGateTests(JSON.parse(savedMocks));
@@ -109,7 +109,7 @@ export default function GateDashboard() {
     });
 
     setSubjects(updated);
-    localStorage.setItem("suman_gate_ce_singleface_v2", JSON.stringify(updated));
+    localStorage.setItem("suman_editorial_syllabus_v1", JSON.stringify(updated));
   };
 
   const handleUndoSubtopic = () => {
@@ -117,14 +117,14 @@ export default function GateDashboard() {
     const prev = syllabusHistory[syllabusHistory.length - 1];
     setSyllabusHistory((p) => p.slice(0, -1));
     setSubjects(prev);
-    localStorage.setItem("suman_gate_ce_singleface_v2", JSON.stringify(prev));
+    localStorage.setItem("suman_editorial_syllabus_v1", JSON.stringify(prev));
   };
 
   const handleAddTest = (entry: GateMockEntry) => {
     setMockHistory((prev) => [...prev.slice(-10), JSON.parse(JSON.stringify(gateTests))]);
     const updated = [...gateTests, entry];
     setGateTests(updated);
-    localStorage.setItem("suman_gate_ce_mocks_singleface_v2", JSON.stringify(updated));
+    localStorage.setItem("suman_editorial_mocks_v1", JSON.stringify(updated));
   };
 
   const handleUndoMock = () => {
@@ -132,7 +132,7 @@ export default function GateDashboard() {
     const prev = mockHistory[mockHistory.length - 1];
     setMockHistory((p) => p.slice(0, -1));
     setGateTests(prev);
-    localStorage.setItem("suman_gate_ce_mocks_singleface_v2", JSON.stringify(prev));
+    localStorage.setItem("suman_editorial_mocks_v1", JSON.stringify(prev));
   };
 
   let earnedScore = 0;
@@ -154,39 +154,39 @@ export default function GateDashboard() {
     maxPossibleScore > 0 ? Math.round((earnedScore / maxPossibleScore) * 100) : 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#eef4f8] overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-[#fffdfa] overflow-x-hidden">
       <GoalHeader overallProgress={overallProgress} />
 
-      <main className="max-w-7xl mx-auto w-full p-2.5 sm:p-5 flex-1 space-y-3">
-        {/* Navigation Tabs (DISCIPLINE, SYLLABUS, MOCKS) */}
-        <div className="flex items-center justify-between border-b-2 border-[#0b2545] pb-2 gap-2 overflow-x-auto scrollbar-none whitespace-nowrap">
+      <main className="max-w-7xl mx-auto w-full p-2.5 sm:p-4 flex-1 space-y-3">
+        {/* Navigation Tabs */}
+        <div className="flex items-center justify-between border-b-2 border-[#7a1c00]/30 pb-2 gap-2 overflow-x-auto scrollbar-none whitespace-nowrap">
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => setActiveTab("habits")}
-              className={`px-3 py-1.5 text-xs font-black border-2 border-[#0b2545] rounded transition-all shrink-0 ${
+              className={`px-3 py-1.5 text-xs font-black rounded-xl border-2 border-[#7a1c00] transition-all shrink-0 ${
                 activeTab === "habits"
-                  ? "bg-white text-[#0b2545] shadow-[2px_2px_0px_0px_#0b2545]"
-                  : "bg-[#8da9c4]/20 text-[#0b2545] hover:bg-white"
+                  ? "bg-[#7a1c00] text-white shadow-sm"
+                  : "bg-white text-[#7a1c00] hover:bg-[#fff8f0]"
               }`}
             >
               📅 DISCIPLINE
             </button>
             <button
               onClick={() => setActiveTab("syllabus")}
-              className={`px-3 py-1.5 text-xs font-black border-2 border-[#0b2545] rounded transition-all shrink-0 ${
+              className={`px-3 py-1.5 text-xs font-black rounded-xl border-2 border-[#7a1c00] transition-all shrink-0 ${
                 activeTab === "syllabus"
-                  ? "bg-white text-[#0b2545] shadow-[2px_2px_0px_0px_#0b2545]"
-                  : "bg-[#8da9c4]/20 text-[#0b2545] hover:bg-white"
+                  ? "bg-[#7a1c00] text-white shadow-sm"
+                  : "bg-white text-[#7a1c00] hover:bg-[#fff8f0]"
               }`}
             >
               ⚙️ SYLLABUS
             </button>
             <button
               onClick={() => setActiveTab("mocks")}
-              className={`px-3 py-1.5 text-xs font-black border-2 border-[#0b2545] rounded transition-all shrink-0 ${
+              className={`px-3 py-1.5 text-xs font-black rounded-xl border-2 border-[#7a1c00] transition-all shrink-0 ${
                 activeTab === "mocks"
-                  ? "bg-white text-[#0b2545] shadow-[2px_2px_0px_0px_#0b2545]"
-                  : "bg-[#8da9c4]/20 text-[#0b2545] hover:bg-white"
+                  ? "bg-[#7a1c00] text-white shadow-sm"
+                  : "bg-white text-[#7a1c00] hover:bg-[#fff8f0]"
               }`}
             >
               🎯 MOCKS
@@ -196,7 +196,7 @@ export default function GateDashboard() {
           {activeTab === "syllabus" && syllabusHistory.length > 0 && (
             <button
               onClick={handleUndoSubtopic}
-              className="px-2.5 py-1 text-xs font-black bg-[#ef4444] text-white border-2 border-[#0b2545] shadow-[1px_1px_0px_0px_#0b2545] flex items-center gap-1 shrink-0"
+              className="px-2.5 py-1 text-xs font-black bg-rose-700 text-white border-2 border-[#7a1c00] rounded-xl shadow-sm flex items-center gap-1 shrink-0"
             >
               <RotateCcw className="w-3 h-3" /> UNDO
             </button>
@@ -205,14 +205,13 @@ export default function GateDashboard() {
           {activeTab === "mocks" && mockHistory.length > 0 && (
             <button
               onClick={handleUndoMock}
-              className="px-2.5 py-1 text-xs font-black bg-[#ef4444] text-white border-2 border-[#0b2545] shadow-[1px_1px_0px_0px_#0b2545] flex items-center gap-1 shrink-0"
+              className="px-2.5 py-1 text-xs font-black bg-rose-700 text-white border-2 border-[#7a1c00] rounded-xl shadow-sm flex items-center gap-1 shrink-0"
             >
               <RotateCcw className="w-3 h-3" /> UNDO TEST
             </button>
           )}
         </div>
 
-        {/* Tab Content */}
         {activeTab === "habits" && <DailyTracker />}
 
         {activeTab === "syllabus" && (
@@ -235,10 +234,10 @@ export default function GateDashboard() {
         )}
       </main>
 
-      <footer className="bg-[#0b2545] text-[#8da9c4] border-t-4 border-[#0b2545] p-4 mt-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-xs font-mono">
+      <footer className="bg-[#7a1c00] text-[#f5d6a8] border-t-2 border-[#2c0d0d] p-3 mt-6 rounded-t-2xl">
+        <div className="max-w-7xl mx-auto flex justify-between items-center text-xs font-mono-code">
           <span>SUMAN KUMAR MAHATO // IIT BOMBAY</span>
-          <span className="text-[#e0a96d]">ज्ञानं परमं बलम्</span>
+          <span className="text-[#ffe600]">ज्ञानं परमं बलम्</span>
         </div>
       </footer>
     </div>
