@@ -10,18 +10,18 @@ import { RotateCcw } from "lucide-react";
 export const IITB_CIVIL_SYLLABUS: GateSubjectGroup[] = [
   {
     key: "geotech",
-    title: "Geotechnical Engineering (Soil Mechanics & Foundations)",
+    title: "Geotechnical Engineering",
     marks: "~14-16 Marks [Core Trinity]",
     chapters: [
       {
         id: "geo-c1",
         title: "Soil Mechanics & Foundation Core",
-        weightage: "~14M",
+        weightage: "~15M",
         subtopics: [
-          { id: "g-1", name: "Three-phase system, void ratio, porosity, saturation & index relations", is8020: true, status: 0, notesDone: false, pyqDone: false },
-          { id: "g-2", name: "Atterberg limits, plasticity chart & IS soil classification", is8020: true, status: 0, notesDone: false, pyqDone: false },
-          { id: "g-3", name: "Darcy's law, permeability & effective stress concept", is8020: true, status: 0, notesDone: false, pyqDone: false },
-          { id: "g-4", name: "Terzaghi consolidation theory, Mohr-Coulomb shear strength & bearing capacity", is8020: true, status: 0, notesDone: false, pyqDone: false },
+          { id: "g-1", name: "Three-phase system, void ratio, porosity, saturation & index relations", is8020: true, status: 0, notesDone: false, pyqDone: false, dppDone: false },
+          { id: "g-2", name: "Atterberg limits, plasticity chart & IS soil classification", is8020: true, status: 0, notesDone: false, pyqDone: false, dppDone: false },
+          { id: "g-3", name: "Darcy's law, permeability & effective stress concept", is8020: true, status: 0, notesDone: false, pyqDone: false, dppDone: false },
+          { id: "g-4", name: "Terzaghi consolidation theory, Mohr-Coulomb shear strength & bearing capacity", is8020: true, status: 0, notesDone: false, pyqDone: false, dppDone: false },
         ],
       },
     ],
@@ -36,9 +36,9 @@ export const IITB_CIVIL_SYLLABUS: GateSubjectGroup[] = [
         title: "Linear Algebra, Calculus & Probability",
         weightage: "~13M",
         subtopics: [
-          { id: "m-1", name: "Matrix rank, system of linear equations (AX=B) & Eigenvalues", is8020: true, status: 0, notesDone: false, pyqDone: false },
-          { id: "m-2", name: "Vector Calculus (Gradient, Divergence, Curl, Gauss/Stokes theorems)", is8020: true, status: 0, notesDone: false, pyqDone: false },
-          { id: "m-3", name: "Probability distributions (Poisson, Normal) & Numerical Methods", is8020: true, status: 0, notesDone: false, pyqDone: false },
+          { id: "m-1", name: "Matrix rank, system of linear equations (AX=B) & Eigenvalues", is8020: true, status: 0, notesDone: false, pyqDone: false, dppDone: false },
+          { id: "m-2", name: "Vector Calculus (Gradient, Divergence, Curl, Gauss/Stokes theorems)", is8020: true, status: 0, notesDone: false, pyqDone: false, dppDone: false },
+          { id: "m-3", name: "Probability distributions (Poisson, Normal) & Numerical Methods", is8020: true, status: 0, notesDone: false, pyqDone: false, dppDone: false },
         ],
       },
     ],
@@ -53,8 +53,8 @@ export const IITB_CIVIL_SYLLABUS: GateSubjectGroup[] = [
         title: "Water & Wastewater Engineering",
         weightage: "~11M",
         subtopics: [
-          { id: "e-1", name: "Water quality standards, sedimentation, rapid sand filters & chlorination", is8020: true, status: 0, notesDone: false, pyqDone: false },
-          { id: "e-2", name: "BOD kinetics, Activated Sludge Process (ASP) & Streeter-Phelps sag equation", is8020: true, status: 0, notesDone: false, pyqDone: false },
+          { id: "e-1", name: "Water quality standards, sedimentation, rapid sand filters & chlorination", is8020: true, status: 0, notesDone: false, pyqDone: false, dppDone: false },
+          { id: "e-2", name: "BOD kinetics, Activated Sludge Process (ASP) & Streeter-Phelps sag equation", is8020: true, status: 0, notesDone: false, pyqDone: false, dppDone: false },
         ],
       },
     ],
@@ -70,13 +70,13 @@ export default function GateDashboard() {
   const [mockHistory, setMockHistory] = useState<GateMockEntry[][]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("suman_gate_ce_singleface_v1");
+    const saved = localStorage.getItem("suman_gate_ce_singleface_v2");
     if (saved) {
       try {
         setSubjects(JSON.parse(saved));
       } catch (e) {}
     }
-    const savedMocks = localStorage.getItem("suman_gate_ce_mocks_singleface_v1");
+    const savedMocks = localStorage.getItem("suman_gate_ce_mocks_singleface_v2");
     if (savedMocks) {
       try {
         setGateTests(JSON.parse(savedMocks));
@@ -109,7 +109,7 @@ export default function GateDashboard() {
     });
 
     setSubjects(updated);
-    localStorage.setItem("suman_gate_ce_singleface_v1", JSON.stringify(updated));
+    localStorage.setItem("suman_gate_ce_singleface_v2", JSON.stringify(updated));
   };
 
   const handleUndoSubtopic = () => {
@@ -117,14 +117,14 @@ export default function GateDashboard() {
     const prev = syllabusHistory[syllabusHistory.length - 1];
     setSyllabusHistory((p) => p.slice(0, -1));
     setSubjects(prev);
-    localStorage.setItem("suman_gate_ce_singleface_v1", JSON.stringify(prev));
+    localStorage.setItem("suman_gate_ce_singleface_v2", JSON.stringify(prev));
   };
 
   const handleAddTest = (entry: GateMockEntry) => {
     setMockHistory((prev) => [...prev.slice(-10), JSON.parse(JSON.stringify(gateTests))]);
     const updated = [...gateTests, entry];
     setGateTests(updated);
-    localStorage.setItem("suman_gate_ce_mocks_singleface_v1", JSON.stringify(updated));
+    localStorage.setItem("suman_gate_ce_mocks_singleface_v2", JSON.stringify(updated));
   };
 
   const handleUndoMock = () => {
@@ -132,7 +132,7 @@ export default function GateDashboard() {
     const prev = mockHistory[mockHistory.length - 1];
     setMockHistory((p) => p.slice(0, -1));
     setGateTests(prev);
-    localStorage.setItem("suman_gate_ce_mocks_singleface_v1", JSON.stringify(prev));
+    localStorage.setItem("suman_gate_ce_mocks_singleface_v2", JSON.stringify(prev));
   };
 
   let earnedScore = 0;
@@ -157,13 +157,13 @@ export default function GateDashboard() {
     <div className="min-h-screen flex flex-col bg-[#eef4f8] overflow-x-hidden">
       <GoalHeader overallProgress={overallProgress} />
 
-      <main className="max-w-7xl mx-auto w-full p-2 sm:p-4 flex-1 space-y-3">
-        {/* Compact Navigation Bar */}
+      <main className="max-w-7xl mx-auto w-full p-2.5 sm:p-5 flex-1 space-y-3">
+        {/* Navigation Tabs (DISCIPLINE, SYLLABUS, MOCKS) */}
         <div className="flex items-center justify-between border-b-2 border-[#0b2545] pb-2 gap-2 overflow-x-auto scrollbar-none whitespace-nowrap">
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => setActiveTab("habits")}
-              className={`px-2.5 py-1 text-[11px] font-black border-2 border-[#0b2545] rounded transition-all shrink-0 ${
+              className={`px-3 py-1.5 text-xs font-black border-2 border-[#0b2545] rounded transition-all shrink-0 ${
                 activeTab === "habits"
                   ? "bg-white text-[#0b2545] shadow-[2px_2px_0px_0px_#0b2545]"
                   : "bg-[#8da9c4]/20 text-[#0b2545] hover:bg-white"
@@ -173,17 +173,17 @@ export default function GateDashboard() {
             </button>
             <button
               onClick={() => setActiveTab("syllabus")}
-              className={`px-2.5 py-1 text-[11px] font-black border-2 border-[#0b2545] rounded transition-all shrink-0 ${
+              className={`px-3 py-1.5 text-xs font-black border-2 border-[#0b2545] rounded transition-all shrink-0 ${
                 activeTab === "syllabus"
                   ? "bg-white text-[#0b2545] shadow-[2px_2px_0px_0px_#0b2545]"
                   : "bg-[#8da9c4]/20 text-[#0b2545] hover:bg-white"
               }`}
             >
-              ⚙️ 80/20 TRINITY
+              ⚙️ SYLLABUS
             </button>
             <button
               onClick={() => setActiveTab("mocks")}
-              className={`px-2.5 py-1 text-[11px] font-black border-2 border-[#0b2545] rounded transition-all shrink-0 ${
+              className={`px-3 py-1.5 text-xs font-black border-2 border-[#0b2545] rounded transition-all shrink-0 ${
                 activeTab === "mocks"
                   ? "bg-white text-[#0b2545] shadow-[2px_2px_0px_0px_#0b2545]"
                   : "bg-[#8da9c4]/20 text-[#0b2545] hover:bg-white"
@@ -196,7 +196,7 @@ export default function GateDashboard() {
           {activeTab === "syllabus" && syllabusHistory.length > 0 && (
             <button
               onClick={handleUndoSubtopic}
-              className="px-2 py-0.5 text-[10px] font-black bg-[#ef4444] text-white border-2 border-[#0b2545] shadow-[1px_1px_0px_0px_#0b2545] flex items-center gap-1 shrink-0"
+              className="px-2.5 py-1 text-xs font-black bg-[#ef4444] text-white border-2 border-[#0b2545] shadow-[1px_1px_0px_0px_#0b2545] flex items-center gap-1 shrink-0"
             >
               <RotateCcw className="w-3 h-3" /> UNDO
             </button>
@@ -205,14 +205,14 @@ export default function GateDashboard() {
           {activeTab === "mocks" && mockHistory.length > 0 && (
             <button
               onClick={handleUndoMock}
-              className="px-2 py-0.5 text-[10px] font-black bg-[#ef4444] text-white border-2 border-[#0b2545] shadow-[1px_1px_0px_0px_#0b2545] flex items-center gap-1 shrink-0"
+              className="px-2.5 py-1 text-xs font-black bg-[#ef4444] text-white border-2 border-[#0b2545] shadow-[1px_1px_0px_0px_#0b2545] flex items-center gap-1 shrink-0"
             >
-              <RotateCcw className="w-3 h-3" /> UNDO
+              <RotateCcw className="w-3 h-3" /> UNDO TEST
             </button>
           )}
         </div>
 
-        {/* Tab Views */}
+        {/* Tab Content */}
         {activeTab === "habits" && <DailyTracker />}
 
         {activeTab === "syllabus" && (
@@ -235,10 +235,10 @@ export default function GateDashboard() {
         )}
       </main>
 
-      <footer className="bg-[#0b2545] text-[#8da9c4] border-t-2 border-[#0b2545] p-3 mt-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-[10px] font-mono">
-          <span>IIT BOMBAY // MISSION 70+</span>
-          <span className="text-[#e0a96d]">ज्ञानम् परमम् ध्येयम्</span>
+      <footer className="bg-[#0b2545] text-[#8da9c4] border-t-4 border-[#0b2545] p-4 mt-6">
+        <div className="max-w-7xl mx-auto flex justify-between items-center text-xs font-mono">
+          <span>SUMAN KUMAR MAHATO // IIT BOMBAY</span>
+          <span className="text-[#e0a96d]">ज्ञानं परमं बलम्</span>
         </div>
       </footer>
     </div>
