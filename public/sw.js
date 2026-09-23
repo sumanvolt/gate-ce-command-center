@@ -1,4 +1,4 @@
-const CACHE_NAME = "iitb-ce-v101-fresh";
+const CACHE_NAME = "editorial-iitb-v1";
 
 self.addEventListener("install", (e) => {
   self.skipWaiting();
